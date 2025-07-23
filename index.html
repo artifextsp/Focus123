@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Challenge - Entrenamiento de Atención con Colores</title>
+    <title>Color Challenge 4D - Entrenamiento de Atención con Colores</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 25%, #45b7d1 50%, #96ceb4 75%, #ffeaa7 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -28,13 +28,13 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             width: 95%;
             max-width: 900px;
-            min-height: 600px;
+            min-height: 700px;
             position: relative;
             overflow: hidden;
         }
 
         .game-header {
-            background: linear-gradient(90deg, #ff6b6b, #ff5252);
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #ffeaa7);
             color: white;
             padding: 15px 20px;
             display: flex;
@@ -132,24 +132,52 @@
             75% { transform: scale(1.05); }
         }
 
+        /* NUEVO LAYOUT EN CRUZ */
         .game-area {
             display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 20px;
             padding: 40px 20px;
-            min-height: 400px;
+            min-height: 500px;
             align-items: center;
+        }
+
+        /* Posicionamiento en cruz */
+        .top-zone {
+            grid-row: 1;
+            grid-column: 2;
+        }
+
+        .left-zone {
+            grid-row: 2;
+            grid-column: 1;
+        }
+
+        .center-area {
+            grid-row: 2;
+            grid-column: 2;
+        }
+
+        .right-zone {
+            grid-row: 2;
+            grid-column: 3;
+        }
+
+        .bottom-zone {
+            grid-row: 3;
+            grid-column: 2;
         }
 
         .color-zone {
             border: 4px solid #ddd;
             border-radius: 20px;
-            min-height: 150px;
+            min-height: 120px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
+            font-size: 16px;
             font-weight: bold;
             color: white;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
@@ -157,6 +185,7 @@
             position: relative;
         }
 
+        /* Colores para las 4 zonas */
         .color-zone.red-zone {
             background: linear-gradient(135deg, #ff6b6b, #ff5252);
         }
@@ -165,10 +194,12 @@
             background: linear-gradient(135deg, #4ecdc4, #26a69a);
         }
 
-        .color-zone.drag-over {
-            border-color: #ffd700;
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+        .color-zone.green-zone {
+            background: linear-gradient(135deg, #96ceb4, #74b9a4);
+        }
+
+        .color-zone.yellow-zone {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
         }
 
         .color-zone.correct {
@@ -185,6 +216,12 @@
             animation: swapGlow 1s ease;
         }
 
+        .color-zone.active-key {
+            border-color: #ffd700;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+        }
+
         .element-area {
             display: flex;
             justify-content: center;
@@ -193,17 +230,17 @@
         }
 
         .color-element {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             border-radius: 20px;
             border: 4px solid #fff;
             box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            cursor: grab;
             transition: all 0.3s ease;
             position: relative;
             z-index: 10;
         }
 
+        /* Colores para el elemento central */
         .color-element.red-color {
             background: linear-gradient(135deg, #ff6b6b, #ff5252);
         }
@@ -212,21 +249,22 @@
             background: linear-gradient(135deg, #4ecdc4, #26a69a);
         }
 
-        .color-element.white-dragging {
-            background: linear-gradient(135deg, #ffffff, #f5f5f5) !important;
-            border-color: #ddd;
+        .color-element.green-color {
+            background: linear-gradient(135deg, #96ceb4, #74b9a4);
         }
 
-        .color-element:hover {
-            transform: scale(1.1);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+        .color-element.yellow-color {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
         }
 
-        .color-element.dragging {
-            cursor: grabbing;
-            transform: scale(1.2) rotate(5deg);
-            z-index: 1000;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        .color-element.pulse {
+            animation: elementPulse 0.3s ease;
+        }
+
+        @keyframes elementPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         .feedback {
@@ -244,13 +282,45 @@
             animation: feedbackFloat 1s ease-out;
         }
 
-        .game-controls {
+        /* CONTROLES DE TECLADO */
+        .keyboard-controls {
             display: flex;
             justify-content: center;
             gap: 15px;
             padding: 20px;
             background: #f8f9fa;
+            flex-wrap: wrap;
         }
+
+        .key-hint {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .key-icon {
+            width: 24px;
+            height: 24px;
+            background: #333;
+            color: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .key-hint.red { border-left: 4px solid #ff6b6b; }
+        .key-hint.blue { border-left: 4px solid #4ecdc4; }
+        .key-hint.green { border-left: 4px solid #96ceb4; }
+        .key-hint.yellow { border-left: 4px solid #ffeaa7; }
 
         .btn {
             padding: 12px 24px;
@@ -260,6 +330,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
+            margin: 5px;
         }
 
         .btn-primary {
@@ -311,7 +382,7 @@
         }
 
         .welcome-content {
-            max-width: 650px;
+            max-width: 700px;
             width: 95%;
             padding: 20px;
             max-height: 90vh;
@@ -337,6 +408,51 @@
             margin-bottom: 10px;
             line-height: 1.4;
             font-size: 13px;
+        }
+
+        .control-demo {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 15px 0;
+            max-width: 150px;
+        }
+
+        .demo-key {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .demo-key.up {
+            grid-column: 2;
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
+            color: white;
+        }
+
+        .demo-key.left {
+            grid-column: 1;
+            grid-row: 2;
+            background: linear-gradient(135deg, #96ceb4, #74b9a4);
+            color: white;
+        }
+
+        .demo-key.right {
+            grid-column: 3;
+            grid-row: 2;
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            color: #333;
+        }
+
+        .demo-key.down {
+            grid-column: 2;
+            grid-row: 2;
+            background: linear-gradient(135deg, #4ecdc4, #26a69a);
+            color: white;
         }
 
         .skills-list {
@@ -674,30 +790,19 @@
         /* Responsive Design */
         @media (max-width: 768px) {
             .game-area {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto auto auto;
-                gap: 30px;
+                gap: 15px;
                 padding: 20px 15px;
+                min-height: 450px;
             }
 
             .color-zone {
-                min-height: 100px;
-                font-size: 18px;
-                order: 1;
-            }
-
-            .element-area {
-                order: 2;
-                grid-column: 1;
-            }
-
-            .color-zone:last-child {
-                order: 3;
+                min-height: 80px;
+                font-size: 14px;
             }
 
             .color-element {
-                width: 100px;
-                height: 100px;
+                width: 80px;
+                height: 80px;
             }
 
             .score-info {
@@ -712,6 +817,16 @@
 
             .countdown-progress {
                 padding: 6px 10px;
+            }
+
+            .keyboard-controls {
+                padding: 15px;
+                gap: 10px;
+            }
+
+            .key-hint {
+                font-size: 11px;
+                padding: 6px 8px;
             }
 
             .welcome-layout {
@@ -771,14 +886,30 @@
             }
 
             .color-element {
-                width: 80px;
-                height: 80px;
+                width: 70px;
+                height: 70px;
             }
 
             .color-zone {
-                min-height: 80px;
-                font-size: 16px;
+                min-height: 70px;
+                font-size: 12px;
+                padding: 8px;
+            }
+
+            .keyboard-controls {
                 padding: 10px;
+                gap: 6px;
+            }
+
+            .key-hint {
+                font-size: 10px;
+                padding: 4px 6px;
+            }
+
+            .key-icon {
+                width: 20px;
+                height: 20px;
+                font-size: 8px;
             }
 
             .modal-content {
@@ -829,29 +960,58 @@
             <div class="score-info">
                 <div class="countdown-progress">
                     <span class="countdown-label">🎯 Para avanzar:</span>
-                    <span class="countdown-value" id="correctsNeeded">12</span>
+                    <span class="countdown-value" id="correctsNeeded">15</span>
                 </div>
                 <div>Precisión: <span id="accuracy">100%</span></div>
             </div>
         </div>
 
-        <!-- Área principal del juego -->
+        <!-- Área principal del juego en disposición de cruz -->
         <div class="game-area">
-            <div class="color-zone red-zone" id="leftZone" data-color="red">
-                <div>🔴 ROJO</div>
+            <!-- Zona superior (ROJO) -->
+            <div class="color-zone red-zone top-zone" id="topZone" data-color="red" data-key="ArrowUp">
+                <div>🔺 ROJO<br><small>↑ ARRIBA</small></div>
             </div>
             
-            <div class="element-area" id="elementArea">
+            <!-- Zona izquierda (VERDE) -->
+            <div class="color-zone green-zone left-zone" id="leftZone" data-color="green" data-key="ArrowLeft">
+                <div>🟢 VERDE<br><small>← IZQUIERDA</small></div>
+            </div>
+            
+            <!-- Elemento central -->
+            <div class="element-area center-area" id="elementArea">
                 <div class="color-element red-color" id="currentColorBox"></div>
             </div>
             
-            <div class="color-zone blue-zone" id="rightZone" data-color="blue">
-                <div>🔵 AZUL</div>
+            <!-- Zona derecha (AMARILLO) -->
+            <div class="color-zone yellow-zone right-zone" id="rightZone" data-color="yellow" data-key="ArrowRight">
+                <div>🟡 AMARILLO<br><small>→ DERECHA</small></div>
+            </div>
+            
+            <!-- Zona inferior (AZUL) -->
+            <div class="color-zone blue-zone bottom-zone" id="bottomZone" data-color="blue" data-key="ArrowDown">
+                <div>🔵 AZUL<br><small>↓ ABAJO</small></div>
             </div>
         </div>
 
-        <!-- Controles del juego -->
-        <div class="game-controls">
+        <!-- Controles de teclado -->
+        <div class="keyboard-controls">
+            <div class="key-hint red">
+                <div class="key-icon">↑</div>
+                <span>ROJO arriba</span>
+            </div>
+            <div class="key-hint green">
+                <div class="key-icon">←</div>
+                <span>VERDE izquierda</span>
+            </div>
+            <div class="key-hint blue">
+                <div class="key-icon">↓</div>
+                <span>AZUL abajo</span>
+            </div>
+            <div class="key-hint yellow">
+                <div class="key-icon">→</div>
+                <span>AMARILLO derecha</span>
+            </div>
             <button class="btn btn-primary" id="hintBtn">💡 Ayuda</button>
         </div>
 
@@ -862,15 +1022,25 @@
     <!-- Modal de bienvenida -->
     <div class="modal" id="welcomeModal">
         <div class="modal-content welcome-content">
-            <h2>🌈 Color Challenge</h2>
-            <p style="font-size: 18px; color: #ff6b6b; font-weight: bold;">¡Juego de Colores para Pequeños Genios!</p>
+            <h2>🌈 Color Challenge 4D</h2>
+            <p style="font-size: 18px; color: #ff6b6b; font-weight: bold;">¡Juego de 4 Colores para Pequeños Genios!</p>
             
             <div class="welcome-layout">
                 <div class="instructions-column">
                     <h3>🎮 Cómo Jugar</h3>
-                    <p><strong>¡Es muy fácil!</strong> Arrastra el cuadrito de color al lado que corresponde.</p>
-                    <p><strong>🔴 Si es ROJO:</strong> Arrástralo a la izquierda</p>
-                    <p><strong>🔵 Si es AZUL:</strong> Arrástralo a la derecha</p>
+                    <p><strong>¡Usa las flechas del teclado!</strong> Presiona la flecha que corresponde al color del cuadro central.</p>
+                    
+                    <div class="control-demo">
+                        <div class="demo-key up">↑<br>ROJO</div>
+                        <div class="demo-key left">←<br>VERDE</div>
+                        <div class="demo-key down">↓<br>AZUL</div>
+                        <div class="demo-key right">→<br>AMARILLO</div>
+                    </div>
+                    
+                    <p><strong>🔴 Si es ROJO:</strong> Presiona ↑ (flecha arriba)</p>
+                    <p><strong>🟢 Si es VERDE:</strong> Presiona ← (flecha izquierda)</p>
+                    <p><strong>🔵 Si es AZUL:</strong> Presiona ↓ (flecha abajo)</p>
+                    <p><strong>🟡 Si es AMARILLO:</strong> Presiona → (flecha derecha)</p>
                     <p><strong>⚠️ ¡Atención!</strong> Los colores pueden intercambiarse de lugar.</p>
                     <button class="btn btn-success" id="startGameBtn">🚀 ¡Empezar a Jugar!</button>
                 </div>
@@ -882,15 +1052,17 @@
                         <li>👀 Reconocimiento de colores</li>
                         <li>🧩 Flexibilidad mental</li>
                         <li>⚡ Velocidad de respuesta</li>
-                        <li>🎮 Coordinación motora</li>
+                        <li>🎮 Coordinación visomotora</li>
                         <li>🧠 Control inhibitorio</li>
+                        <li>🔄 Switching cognitivo</li>
+                        <li>⌨️ Habilidades motoras finas</li>
                     </ul>
                     
                     <div class="designer-credits">
                         <p><strong>Diseñado por:</strong><br>
                         <span class="designer-name">Hansel Peña Diaz</span><br>
                         <small>TSP - Thinking Skills Program</small><br>
-                        <small>Especializado para Grados 1-3</small></p>
+                        <small>Versión 4D - Especializado para Grados 1-3</small></p>
                     </div>
                 </div>
             </div>
@@ -951,19 +1123,19 @@
                 <div class="achievement-display">
                     <div class="level-badge completed" style="background: linear-gradient(135deg, #ffd700, #ffb347);">
                         <div class="level-number">10</div>
-                        <div class="level-name">🌈 Superestrella</div>
+                        <div class="level-name">🌈 Superestrella 4D</div>
                     </div>
                     <div class="score-display">
                         <div class="score-label">Puntaje Final</div>
                         <div class="score-value" id="finalGameScore" style="color: #ffd700;">0</div>
-                        <div class="bonus-info perfect">¡MAESTRO DE COLORES!</div>
+                        <div class="bonus-info perfect">¡MAESTRO DE 4 COLORES!</div>
                     </div>
                 </div>
             </div>
             
-            <div style="background: linear-gradient(135deg, #ff6b6b, #4ecdc4); color: white; padding: 20px; border-radius: 15px; margin: 20px 0;">
+            <div style="background: linear-gradient(135deg, #ff6b6b, #4ecdc4, #96ceb4, #ffeaa7); color: white; padding: 20px; border-radius: 15px; margin: 20px 0;">
                 <h3 style="margin: 0 0 10px 0; font-size: 18px; color: white;">🧠 ¡Felicitaciones!</h3>
-                <p style="margin: 0; font-size: 14px; line-height: 1.4; color: white;">Has completado todos los niveles del Color Challenge. Tu cerebro está súper entrenado para reconocer colores, concentrarse y ser muy rápido pensando.</p>
+                <p style="margin: 0; font-size: 14px; line-height: 1.4; color: white;">Has completado todos los niveles del Color Challenge 4D. Tu cerebro está súper entrenado para reconocer colores, concentrarse, ser muy rápido pensando y coordinar movimientos.</p>
             </div>
             
             <div class="tutor-message">
@@ -1037,7 +1209,7 @@
     </div>
 
     <script>
-        class ColorChallenge {
+        class ColorChallenge4D {
             constructor() {
                 this.gameState = {
                     totalScore: 0,        // Puntos acumulados totales
@@ -1046,11 +1218,11 @@
                     currentColor: 'red',  // Color actual del cuadrado
                     timeRemaining: 30,    // Tiempo más desafiante
                     totalTime: 30,        // Tiempo más desafiante
-                    elementsRemaining: 10,
-                    totalElements: 10,
+                    elementsRemaining: 12,
+                    totalElements: 12,
                     correctAnswers: 0,
                     wrongAnswers: 0,
-                    correctsNeeded: 12,   // 12 puntos por nivel
+                    correctsNeeded: 15,   // 15 puntos por nivel (más desafiante)
                     isPlaying: false,
                     colorSwapped: false,
                     elementsSinceSwap: 0,
@@ -1062,10 +1234,18 @@
                 };
 
                 this.gameConfig = {
-                    swapFrequency: 6,
-                    colors: ['red', 'blue'],
-                    levelThreshold: 8,
+                    swapFrequency: 8,     // Más elementos antes del intercambio
+                    colors: ['red', 'blue', 'green', 'yellow'], // 4 colores
+                    levelThreshold: 10,
                     timeDecrement: 2    // Menos tiempo por nivel para más desafío
+                };
+
+                // Mapeo de teclas a colores
+                this.keyColorMap = {
+                    'ArrowUp': 'red',
+                    'ArrowLeft': 'green', 
+                    'ArrowDown': 'blue',
+                    'ArrowRight': 'yellow'
                 };
 
                 this.levelNames = [
@@ -1078,18 +1258,10 @@
                     "💎 Experto Arcoíris",     // Nivel 7
                     "🔥 Leyenda Colorida",     // Nivel 8
                     "👑 Héroe de Colores",     // Nivel 9
-                    "🌈 Superestrella"         // Nivel 10
+                    "🌈 Superestrella 4D"      // Nivel 10
                 ];
 
                 this.audioContext = null;
-                this.dragState = {
-                    isDragging: false,
-                    dragElement: null,
-                    startX: 0,
-                    startY: 0,
-                    offsetX: 0,
-                    offsetY: 0
-                };
 
                 this.init();
             }
@@ -1100,7 +1272,7 @@
                 this.updateDisplay();
                 this.generateNewColor();
                 
-                console.log('Color Challenge initialized successfully');
+                console.log('Color Challenge 4D initialized successfully');
             }
 
             setupAudio() {
@@ -1138,11 +1310,43 @@
                 document.getElementById('retryBtn').addEventListener('click', () => this.continueFromCurrentLevel());
                 document.getElementById('restartGameBtn').addEventListener('click', () => this.restartFullGame());
 
-                // Sistema de arrastre
-                this.setupDragAndDrop();
-
-                // Prevenir selección de texto
+                // NUEVO: Control por teclado
+                document.addEventListener('keydown', (e) => this.handleKeyPress(e));
+                
+                // Prevenir selección de texto y scroll con flechas
                 document.addEventListener('selectstart', (e) => e.preventDefault());
+                document.addEventListener('keydown', (e) => {
+                    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            handleKeyPress(e) {
+                if (!this.gameState.isPlaying || this.gameState.processingAnswer) return;
+
+                const pressedKey = e.key;
+                
+                // Verificar si es una tecla de flecha válida
+                if (this.keyColorMap.hasOwnProperty(pressedKey)) {
+                    e.preventDefault();
+                    
+                    // Efecto visual en la zona correspondiente
+                    this.highlightKeyZone(pressedKey);
+                    
+                    // Procesar la respuesta
+                    const selectedColor = this.keyColorMap[pressedKey];
+                    this.processAnswer(selectedColor);
+                }
+            }
+
+            highlightKeyZone(key) {
+                // Encontrar la zona que corresponde a esta tecla
+                const zone = document.querySelector(`[data-key="${key}"]`);
+                if (zone) {
+                    zone.classList.add('active-key');
+                    setTimeout(() => zone.classList.remove('active-key'), 200);
+                }
             }
 
             restartFullGame() {
@@ -1151,120 +1355,6 @@
                 
                 // Resetear completamente el juego
                 this.resetGame();
-            }
-
-            setupDragAndDrop() {
-                const colorElement = document.getElementById('currentColorBox');
-                const leftZone = document.getElementById('leftZone');
-                const rightZone = document.getElementById('rightZone');
-
-                // Mouse events
-                colorElement.addEventListener('mousedown', (e) => this.startDrag(e));
-                document.addEventListener('mousemove', (e) => this.onDrag(e));
-                document.addEventListener('mouseup', (e) => this.endDrag(e));
-
-                // Touch events for mobile
-                colorElement.addEventListener('touchstart', (e) => this.startDrag(e), {passive: false});
-                document.addEventListener('touchmove', (e) => this.onDrag(e), {passive: false});
-                document.addEventListener('touchend', (e) => this.endDrag(e));
-
-                // Drop zones
-                leftZone.addEventListener('dragover', (e) => this.onDragOver(e));
-                rightZone.addEventListener('dragover', (e) => this.onDragOver(e));
-                leftZone.addEventListener('drop', (e) => this.onDrop(e));
-                rightZone.addEventListener('drop', (e) => this.onDrop(e));
-            }
-
-            startDrag(e) {
-                if (!this.gameState.isPlaying) return;
-
-                this.dragState.isDragging = true;
-                this.dragState.dragElement = e.target;
-                
-                const rect = e.target.getBoundingClientRect();
-                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-                
-                this.dragState.offsetX = clientX - rect.left;
-                this.dragState.offsetY = clientY - rect.top;
-                this.dragState.startX = rect.left;
-                this.dragState.startY = rect.top;
-
-                // ¡EFECTO ESPECIAL! - El cuadrado se vuelve blanco al arrastrarlo
-                e.target.classList.add('dragging', 'white-dragging');
-                e.target.style.position = 'fixed';
-                e.target.style.zIndex = '1000';
-                e.target.style.pointerEvents = 'none';
-
-                this.gameState.startTime = Date.now();
-
-                e.preventDefault();
-            }
-
-            onDrag(e) {
-                if (!this.dragState.isDragging) return;
-
-                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-
-                // Movimiento súper fluido - sigue exactamente al cursor
-                this.dragState.dragElement.style.left = (clientX - this.dragState.offsetX) + 'px';
-                this.dragState.dragElement.style.top = (clientY - this.dragState.offsetY) + 'px';
-                this.dragState.dragElement.style.transition = 'none';
-
-                // Highlight drop zones
-                const elementsBelow = document.elementsFromPoint(clientX, clientY);
-                const colorZone = elementsBelow.find(el => el.classList.contains('color-zone'));
-                
-                document.querySelectorAll('.color-zone').forEach(zone => {
-                    zone.classList.remove('drag-over');
-                });
-
-                if (colorZone) {
-                    colorZone.classList.add('drag-over');
-                }
-
-                e.preventDefault();
-            }
-
-            endDrag(e) {
-                if (!this.dragState.isDragging) return;
-
-                const clientX = e.clientX || (e.changedTouches && e.changedTouches[0].clientX);
-                const clientY = e.clientY || (e.changedTouches && e.changedTouches[0].clientY);
-
-                // Find drop zone
-                const elementsBelow = document.elementsFromPoint(clientX, clientY);
-                const colorZone = elementsBelow.find(el => el.classList.contains('color-zone'));
-
-                // Reset element position and restore color
-                this.resetDragElement();
-
-                // Process drop
-                if (colorZone) {
-                    this.processAnswer(colorZone.dataset.color);
-                } else {
-                    this.returnToCenter();
-                }
-
-                // Clean up drag state
-                this.dragState.isDragging = false;
-                this.dragState.dragElement = null;
-
-                document.querySelectorAll('.color-zone').forEach(zone => {
-                    zone.classList.remove('drag-over');
-                });
-            }
-
-            resetDragElement() {
-                const element = this.dragState.dragElement;
-                element.classList.remove('dragging', 'white-dragging');
-                element.style.position = '';
-                element.style.left = '';
-                element.style.top = '';
-                element.style.zIndex = '';
-                element.style.pointerEvents = '';
-                element.style.transition = '';
             }
 
             processAnswer(selectedColor) {
@@ -1337,8 +1427,10 @@
 
             highlightZone(color, type) {
                 const zoneElement = document.querySelector(`[data-color="${color}"]`);
-                zoneElement.classList.add(type);
-                setTimeout(() => zoneElement.classList.remove(type), 600);
+                if (zoneElement) {
+                    zoneElement.classList.add(type);
+                    setTimeout(() => zoneElement.classList.remove(type), 600);
+                }
             }
 
             showFeedback(text, type) {
@@ -1356,7 +1448,7 @@
                 const elementArea = document.getElementById('elementArea');
                 const rect = elementArea.getBoundingClientRect();
                 
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < 6; i++) {
                     setTimeout(() => {
                         const sparkle = document.createElement('div');
                         sparkle.className = 'sparkle';
@@ -1370,35 +1462,48 @@
             }
 
             swapZones() {
-                const leftZone = document.getElementById('leftZone');
-                const rightZone = document.getElementById('rightZone');
+                // Con 4 zonas, intercambiar 2 zonas aleatorias
+                const zones = ['topZone', 'leftZone', 'rightZone', 'bottomZone'];
+                const zoneElements = zones.map(id => document.getElementById(id));
+                
+                // Seleccionar dos zonas al azar
+                const randomIndexes = [];
+                while (randomIndexes.length < 2) {
+                    const randomIndex = Math.floor(Math.random() * zones.length);
+                    if (!randomIndexes.includes(randomIndex)) {
+                        randomIndexes.push(randomIndex);
+                    }
+                }
+                
+                const zone1 = zoneElements[randomIndexes[0]];
+                const zone2 = zoneElements[randomIndexes[1]];
                 
                 // Add swap animation
-                leftZone.classList.add('swapping');
-                rightZone.classList.add('swapping');
+                zone1.classList.add('swapping');
+                zone2.classList.add('swapping');
                 
-                // Swap data attributes and text
-                const leftColor = leftZone.dataset.color;
-                const leftText = leftZone.firstElementChild.textContent;
-                const leftClass = leftZone.classList.contains('red-zone') ? 'red-zone' : 'blue-zone';
-                const rightClass = rightZone.classList.contains('red-zone') ? 'red-zone' : 'blue-zone';
+                // Intercambiar datos y clases
+                const zone1Color = zone1.dataset.color;
+                const zone1Text = zone1.firstElementChild.innerHTML;
+                const zone1Classes = Array.from(zone1.classList).filter(c => c.includes('-zone'));
+                const zone2Classes = Array.from(zone2.classList).filter(c => c.includes('-zone'));
                 
-                leftZone.dataset.color = rightZone.dataset.color;
-                leftZone.firstElementChild.textContent = rightZone.firstElementChild.textContent;
-                leftZone.classList.remove(leftClass);
-                leftZone.classList.add(rightClass);
+                zone1.dataset.color = zone2.dataset.color;
+                zone1.firstElementChild.innerHTML = zone2.firstElementChild.innerHTML;
+                zone1Classes.forEach(c => zone1.classList.remove(c));
+                zone2Classes.forEach(c => zone1.classList.add(c));
                 
-                rightZone.dataset.color = leftColor;
-                rightZone.firstElementChild.textContent = leftText;
-                rightZone.classList.remove(rightClass);
-                rightZone.classList.add(leftClass);
+                zone2.dataset.color = zone1Color;
+                zone2.firstElementChild.innerHTML = zone1Text;
+                zone2Classes.forEach(c => zone2.classList.remove(c));
+                zone1Classes.forEach(c => zone2.classList.add(c));
                 
                 this.gameState.elementsSinceSwap = 0;
                 this.playSound(440, 0.3); // A4 note for swap
                 
                 setTimeout(() => {
-                    leftZone.classList.remove('swapping');
-                    rightZone.classList.remove('swapping');
+                    zone1.classList.remove('swapping');
+                    zone2.classList.remove('swapping');
                 }, 1000);
             }
 
@@ -1414,10 +1519,14 @@
                 const colorElement = document.getElementById('currentColorBox');
                 
                 // Remover clases de color anteriores
-                colorElement.classList.remove('red-color', 'blue-color');
+                colorElement.classList.remove('red-color', 'blue-color', 'green-color', 'yellow-color');
                 
                 // Añadir la nueva clase de color
                 colorElement.classList.add(newColor + '-color');
+                
+                // Efecto de pulso para llamar la atención
+                colorElement.classList.add('pulse');
+                setTimeout(() => colorElement.classList.remove('pulse'), 300);
             }
 
             startGame() {
@@ -1428,7 +1537,7 @@
                 
                 // Asegurar que correctsNeeded esté correctamente inicializado
                 if (this.gameState.correctsNeeded <= 0) {
-                    this.gameState.correctsNeeded = 12;
+                    this.gameState.correctsNeeded = 15;
                 }
                 
                 this.startTimer();
@@ -1469,9 +1578,32 @@
 
             showHint() {
                 const currentColor = this.gameState.currentColor;
-                const colorName = currentColor === 'red' ? 'ROJO 🔴' : 'AZUL 🔵';
-                const direction = currentColor === 'red' ? 'izquierda' : 'derecha';
-                const hintText = `Este color es ${colorName} - arrástralo a la ${direction}`;
+                let colorName, direction, key;
+                
+                switch(currentColor) {
+                    case 'red':
+                        colorName = 'ROJO 🔴';
+                        direction = 'ARRIBA';
+                        key = '↑';
+                        break;
+                    case 'green':
+                        colorName = 'VERDE 🟢';
+                        direction = 'IZQUIERDA';
+                        key = '←';
+                        break;
+                    case 'blue':
+                        colorName = 'AZUL 🔵';
+                        direction = 'ABAJO';
+                        key = '↓';
+                        break;
+                    case 'yellow':
+                        colorName = 'AMARILLO 🟡';
+                        direction = 'DERECHA';
+                        key = '→';
+                        break;
+                }
+                
+                const hintText = `${colorName} - presiona ${key} (${direction})`;
                 
                 this.showFeedback(`💡 ${hintText}`, 'hint');
                 this.playSound(329.63, 0.2); // E4 note for hint
@@ -1591,7 +1723,7 @@
                 this.gameState.level++;
                 this.gameState.levelPoints = 0;
                 this.gameState.levelFailures = 0;
-                this.gameState.elementsRemaining = Math.min(30, 10 + this.gameState.level * 2);
+                this.gameState.elementsRemaining = Math.min(35, 12 + this.gameState.level * 2);
                 this.gameState.totalElements = this.gameState.elementsRemaining;
                 this.gameState.timeRemaining = Math.max(15, 30 - (this.gameState.level - 1) * this.gameConfig.timeDecrement);
                 this.gameState.totalTime = this.gameState.timeRemaining;
@@ -1601,7 +1733,7 @@
                 this.gameState.reactionTimes = [];
                 this.gameState.processingAnswer = false;
                 
-                this.gameState.correctsNeeded = 12;
+                this.gameState.correctsNeeded = 15;
                 
                 this.generateNewColor();
                 this.startGame();
@@ -1678,13 +1810,13 @@
                 this.gameState.level = 1;
                 this.gameState.levelPoints = 0;
                 this.gameState.levelFailures = 0;
-                this.gameState.elementsRemaining = 10;
-                this.gameState.totalElements = 10;
+                this.gameState.elementsRemaining = 12;
+                this.gameState.totalElements = 12;
                 this.gameState.timeRemaining = 30;
                 this.gameState.totalTime = 30;
                 this.gameState.correctAnswers = 0;
                 this.gameState.wrongAnswers = 0;
-                this.gameState.correctsNeeded = 12;
+                this.gameState.correctsNeeded = 15;
                 this.gameState.isPlaying = false;
                 this.gameState.colorSwapped = false;
                 this.gameState.elementsSinceSwap = 0;
@@ -1694,28 +1826,47 @@
                 this.gameState.totalScore = savedTotalScore;
                 
                 // Restaurar zonas a posición inicial
-                const leftZone = document.getElementById('leftZone');
-                const rightZone = document.getElementById('rightZone');
-                if (leftZone && rightZone) {
-                    leftZone.dataset.color = 'red';
-                    leftZone.firstElementChild.textContent = '🔴 ROJO';
-                    leftZone.classList.remove('blue-zone');
-                    leftZone.classList.add('red-zone');
-                    
-                    rightZone.dataset.color = 'blue';
-                    rightZone.firstElementChild.textContent = '🔵 AZUL';
-                    rightZone.classList.remove('red-zone');
-                    rightZone.classList.add('blue-zone');
-                }
+                this.resetZonesToInitialState();
                 
                 this.generateNewColor();
+            }
+
+            resetZonesToInitialState() {
+                const topZone = document.getElementById('topZone');
+                const leftZone = document.getElementById('leftZone');
+                const rightZone = document.getElementById('rightZone');
+                const bottomZone = document.getElementById('bottomZone');
+                
+                if (topZone) {
+                    topZone.dataset.color = 'red';
+                    topZone.firstElementChild.innerHTML = '🔺 ROJO<br><small>↑ ARRIBA</small>';
+                    topZone.className = 'color-zone red-zone top-zone';
+                }
+                
+                if (leftZone) {
+                    leftZone.dataset.color = 'green';
+                    leftZone.firstElementChild.innerHTML = '🟢 VERDE<br><small>← IZQUIERDA</small>';
+                    leftZone.className = 'color-zone green-zone left-zone';
+                }
+                
+                if (rightZone) {
+                    rightZone.dataset.color = 'yellow';
+                    rightZone.firstElementChild.innerHTML = '🟡 AMARILLO<br><small>→ DERECHA</small>';
+                    rightZone.className = 'color-zone yellow-zone right-zone';
+                }
+                
+                if (bottomZone) {
+                    bottomZone.dataset.color = 'blue';
+                    bottomZone.firstElementChild.innerHTML = '🔵 AZUL<br><small>↓ ABAJO</small>';
+                    bottomZone.className = 'color-zone blue-zone bottom-zone';
+                }
             }
 
             continueFromCurrentLevel() {
                 document.getElementById('gameOverModal').classList.add('hidden');
                 
                 this.gameState.levelPoints = 0;
-                this.gameState.elementsRemaining = Math.min(30, 10 + this.gameState.level * 2);
+                this.gameState.elementsRemaining = Math.min(35, 12 + this.gameState.level * 2);
                 this.gameState.totalElements = this.gameState.elementsRemaining;
                 this.gameState.timeRemaining = Math.max(15, 30 - (this.gameState.level - 1) * this.gameConfig.timeDecrement);
                 this.gameState.totalTime = this.gameState.timeRemaining;
@@ -1726,7 +1877,7 @@
                 this.gameState.isPlaying = true;
                 this.gameState.processingAnswer = false;
                 
-                this.gameState.correctsNeeded = 12;
+                this.gameState.correctsNeeded = 15;
                 
                 this.generateNewColor();
                 this.startTimer();
@@ -1746,7 +1897,7 @@
                 if (this.gameState.correctsNeeded <= 0) {
                     countdownContainer.classList.add('at-goal');
                     this.playSound(659.25, 0.3); // E5 - sonido de logro
-                } else if (this.gameState.correctsNeeded <= 2) {
+                } else if (this.gameState.correctsNeeded <= 3) {
                     countdownContainer.classList.add('near-goal');
                     this.playSound(587.33, 0.2); // D5 - sonido de cercanía
                 }
@@ -1775,20 +1926,9 @@
                 
                 if (this.gameState.correctsNeeded <= 0) {
                     countdownContainer.classList.add('at-goal');
-                } else if (this.gameState.correctsNeeded <= 2) {
+                } else if (this.gameState.correctsNeeded <= 3) {
                     countdownContainer.classList.add('near-goal');
                 }
-            }
-
-            returnToCenter() {
-                const element = document.getElementById('currentColorBox');
-                element.style.transition = 'transform 0.3s ease';
-                element.style.transform = 'scale(1.1)';
-                
-                setTimeout(() => {
-                    element.style.transform = '';
-                    element.style.transition = '';
-                }, 300);
             }
 
             resetGame() {
@@ -1799,11 +1939,11 @@
                     currentColor: 'red',
                     timeRemaining: 30,
                     totalTime: 30,
-                    elementsRemaining: 10,
-                    totalElements: 10,
+                    elementsRemaining: 12,
+                    totalElements: 12,
                     correctAnswers: 0,
                     wrongAnswers: 0,
-                    correctsNeeded: 12,
+                    correctsNeeded: 15,
                     isPlaying: false,
                     colorSwapped: false,
                     elementsSinceSwap: 0,
@@ -1815,19 +1955,7 @@
                 };
 
                 // Restaurar zonas a posición inicial
-                const leftZone = document.getElementById('leftZone');
-                const rightZone = document.getElementById('rightZone');
-                if (leftZone && rightZone) {
-                    leftZone.dataset.color = 'red';
-                    leftZone.firstElementChild.textContent = '🔴 ROJO';
-                    leftZone.classList.remove('blue-zone');
-                    leftZone.classList.add('red-zone');
-                    
-                    rightZone.dataset.color = 'blue';
-                    rightZone.firstElementChild.textContent = '🔵 AZUL';
-                    rightZone.classList.remove('red-zone');
-                    rightZone.classList.add('blue-zone');
-                }
+                this.resetZonesToInitialState();
 
                 this.generateNewColor();
                 this.updateDisplay();
@@ -1842,7 +1970,8 @@
             // Verificar que todos los elementos existan antes de inicializar
             const requiredElements = [
                 'gameOverModal', 'levelCompleteModal', 'gameCompleteModal', 'welcomeModal',
-                'currentColorBox', 'levelNumber', 'levelName', 'levelPoints', 'totalScore', 'correctsNeeded', 'hintBtn'
+                'currentColorBox', 'levelNumber', 'levelName', 'levelPoints', 'totalScore', 'correctsNeeded', 'hintBtn',
+                'topZone', 'leftZone', 'rightZone', 'bottomZone'
             ];
             
             let allElementsExist = true;
@@ -1854,8 +1983,8 @@
             }
             
             if (allElementsExist) {
-                new ColorChallenge();
-                console.log('🌈 Color Challenge loaded successfully!');
+                new ColorChallenge4D();
+                console.log('🌈 Color Challenge 4D loaded successfully!');
             } else {
                 console.error('❌ Cannot initialize game - missing required elements');
             }
